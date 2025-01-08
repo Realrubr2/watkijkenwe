@@ -11,7 +11,7 @@ import { buildChatGPTRequest } from './utils/chatgpt'; // Import the utility fun
 // Define types for recommendations
 type RecommendationResult = {
   title: string;
-  recommendations: string[];
+  recommendations: Array<{ title: string; description: string }>;
   collectedData: any;
 };
 
@@ -26,16 +26,36 @@ export default function Home() {
 
     try {
       // Call the OpenAI API with the user preferences
-      const recommendations = await buildChatGPTRequest(userPreferences);
-      if (recommendations == null){
-        return error
+      const apiResponse = await buildChatGPTRequest(userPreferences);
+      
+
+      // Check if 'choices' is defined in the response
+      if (apiResponse) {
+        const content = apiResponse
+
+        // Check if content exists and is a valid JSON string
+        if (content) {
+          const parsedContent = JSON.parse(content);
+
+          // Validate the parsed content structure
+          if (parsedContent && Array.isArray(parsedContent.recommendations)) {
+            // Set the recommendation data
+            setRecommendation({
+              title: "Your Recommendations",
+              recommendations: parsedContent.recommendations.map((rec: any) => ({
+                title: rec.title,            // Extract the title
+                description: rec.recomendation,  // Extract the description
+              })),
+              collectedData: userPreferences,
+            });
+          } else {
+            setError("Invalid recommendations format.");
+          }
+        } else {
+          setError("No content found in the response.");
+        }
       } else {
-        // Set the recommendation data
-        setRecommendation({
-          title: "Your Recommendations",
-          recommendations: recommendations.split('\n'), // Assuming the recommendations are returned as a string with newlines
-          collectedData: userPreferences,
-        });
+        setError("No choices available in the response.");
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
@@ -75,7 +95,7 @@ export default function Home() {
               <ul className="space-y-2 text-left text-lg">
                 {recommendation.recommendations.map((rec, index) => (
                   <li key={index} className="bg-white p-2 rounded-md">
-                    {rec}
+                    <strong>{rec.title}</strong>: {rec.description}
                   </li>
                 ))}
               </ul>

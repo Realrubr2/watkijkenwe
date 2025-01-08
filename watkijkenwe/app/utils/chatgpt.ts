@@ -1,8 +1,23 @@
 // utils/chatgpt.ts
 import OpenAI from "openai";
+import { z } from "zod";
+import { zodResponseFormat } from "openai/helpers/zod";
 
 
-// Define the structure of user preferences
+const recommendationsArray = z.object({
+  recommendations: z.array(
+    z.object({
+      title: z.string(),
+      streamingServices: z.array(z.string()),
+      recomendation: z.string(),
+    })
+  )
+});
+
+
+
+
+// structure of user preferences
 type UserPreferences = {
   type: string;
   platform: string[];
@@ -13,12 +28,8 @@ type UserPreferences = {
   duration: string;
 };
 
-const arrr:OpenAI.Chat.Completions.ChatCompletionContentPartText = {
-    text: "Can you recommend a movie?",
-    type: "text"
-  };
+const apikey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 
-const apikey = process.env.OPENAI_API_KEY
 // Initialize OpenAI client
 const openai = new OpenAI({ apiKey: apikey,dangerouslyAllowBrowser: true});
 
@@ -33,7 +44,7 @@ export async function buildChatGPTRequest(userPreferences: UserPreferences) {
     - Preferred duration: ${userPreferences.duration}`;
     try {
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini", // Or "gpt-4" if you want to use GPT-4
+            model: "gpt-4o-mini", 
             messages: [
                 {
                     role: "developer",
@@ -48,10 +59,11 @@ export async function buildChatGPTRequest(userPreferences: UserPreferences) {
                     content: prompt,
                 },
             ],
-            
+            response_format: zodResponseFormat(recommendationsArray, "event"),
         });
         
         console.log(response)
+
     // Assuming the response will contain the recommendations in the assistant's reply
     return response.choices[0].message.content;
   } catch (error) {
