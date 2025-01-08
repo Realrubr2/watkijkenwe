@@ -1,4 +1,4 @@
-'use client'; // Mark the file as a client component
+'use client'; 
 
 import { useState } from 'react';
 import RecommendationForm from '../components/RecommendationForm';
@@ -6,12 +6,12 @@ import { LoadingAnimation } from '../components/LoadingAnimation';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from '../components/Navbar';
-import { buildChatGPTRequest } from './utils/chatgpt'; // Import the utility function
+import { buildChatGPTRequest } from './utils/chatgpt'; 
 
-// Define types for recommendations
 type RecommendationResult = {
   title: string;
   recommendations: Array<{ title: string; description: string }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collectedData: any;
 };
 
@@ -20,42 +20,32 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (userPreferences: any) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Call the OpenAI API with the user preferences
       const apiResponse = await buildChatGPTRequest(userPreferences);
       
+      if (apiResponse && apiResponse !== "") {
+        const parsedContent = JSON.parse(apiResponse);
 
-      // Check if 'choices' is defined in the response
-      if (apiResponse) {
-        const content = apiResponse
-
-        // Check if content exists and is a valid JSON string
-        if (content) {
-          const parsedContent = JSON.parse(content);
-
-          // Validate the parsed content structure
-          if (parsedContent && Array.isArray(parsedContent.recommendations)) {
-            // Set the recommendation data
-            setRecommendation({
-              title: "Your Recommendations",
-              recommendations: parsedContent.recommendations.map((rec: any) => ({
-                title: rec.title,            // Extract the title
-                description: rec.recomendation,  // Extract the description
-              })),
-              collectedData: userPreferences,
-            });
-          } else {
-            setError("Invalid recommendations format.");
-          }
+        if (parsedContent && Array.isArray(parsedContent.recommendations)) {
+          setRecommendation({
+            title: "Your Recommendations",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            recommendations: parsedContent.recommendations.map((rec: any) => ({
+              title: rec.title,            
+              description: rec.recomendation,  
+            })),
+            collectedData: userPreferences,
+          });
         } else {
-          setError("No content found in the response.");
+          setError("Invalid recommendations format.");
         }
       } else {
-        setError("No choices available in the response.");
+        setError("No content found in the response.");
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
@@ -101,9 +91,14 @@ export default function Home() {
               </ul>
             </div>
             <h3 className="text-xl font-bold mt-8 mb-2">Verzamelde gegevens:</h3>
-            <pre className="bg-gray-100 p-4 rounded-md overflow-auto text-left text-sm">
-              {JSON.stringify(recommendation.collectedData, null, 2)}
-            </pre>
+            <div className="bg-gray-100 p-4 rounded-md shadow-md">
+              {/* Render collected data in a user-friendly format */}
+              {Object.entries(recommendation.collectedData).map(([key, value]) => (
+                <p key={key} className="text-lg mb-2">
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {Array.isArray(value) ? value.join(", ") : value}
+                </p>
+              ))}
+            </div>
             <Button onClick={handleRetry} className="mt-4">Nieuwe aanbeveling</Button>
           </div>
         )}
