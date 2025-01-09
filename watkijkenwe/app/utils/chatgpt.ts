@@ -27,7 +27,7 @@ type UserPreferences = {
   duur: string;
 };
 
-const apikey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+const apikey = process.env.OPENAI_API_KEY
 
 // Initialize OpenAI client
 const openai = new OpenAI({ apiKey: apikey,dangerouslyAllowBrowser: true});
