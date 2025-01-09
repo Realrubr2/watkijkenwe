@@ -30,7 +30,7 @@ type UserPreferences = {
 const apikey = process.env.OPENAI_API_KEY
 
 // Initialize OpenAI client
-const openai = new OpenAI({ apiKey: apikey,dangerouslyAllowBrowser: true});
+const openai = new OpenAI({ apiKey: apikey});
 
 // Build the API request to OpenAI
 export async function buildChatGPTRequest(userPreferences: UserPreferences) {
