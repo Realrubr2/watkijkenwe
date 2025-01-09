@@ -16,16 +16,15 @@ const recommendationsArray = z.object({
 
 
 
-
 // structure of user preferences
 type UserPreferences = {
   type: string;
   platform: string[];
-  viewers: string;
-  time: string;
-  mood: string;
+  kijkers: string;
+  tijd: string;
+  stemming: string;
   genre: string;
-  duration: string;
+  duur: string;
 };
 
 const apikey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
@@ -37,11 +36,11 @@ const openai = new OpenAI({ apiKey: apikey,dangerouslyAllowBrowser: true});
 export async function buildChatGPTRequest(userPreferences: UserPreferences) {
   const prompt = `Recommend 5 ${userPreferences.type.toLowerCase()}s based on the following preferences:
     - Platform(s): ${userPreferences.platform.join(', ')}
-    - Number of viewers: ${userPreferences.viewers}
-    - Time of day: ${new Date(userPreferences.time).toLocaleTimeString()}
-    - Mood: ${userPreferences.mood}
-    - Preferred genre: ${userPreferences.genre}
-    - Preferred duration: ${userPreferences.duration}`;
+    - Aantal kijkers: ${userPreferences.kijkers}
+    - Tijd van de dag: ${new Date(userPreferences.tijd).toLocaleTimeString()}
+    - stemming: ${userPreferences.stemming}
+    - genre voorkeur: ${userPreferences.genre}
+    - lengte: ${userPreferences.duur}`;
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini", 
