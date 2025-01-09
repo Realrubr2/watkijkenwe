@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 
 type FormData = {
   type: string;
   platform: string[];
-  kijkers: string;
+  kijkers: number;
   tijd: string;
   stemming: string;
   genre: string;
@@ -23,7 +23,7 @@ type Question = {
   key: keyof FormData;
   question: string;
   options?: string[];
-  type: 'radio' | 'checkbox' | 'number' | 'select';
+  type: 'radio' | 'checkbox' | 'number' | 'select' | 'slider';
 };
 
 export default function RecommendationForm({ onSubmit }: { onSubmit: (data: FormData) => void }) {
@@ -31,7 +31,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
   const [formData, setFormData] = useState<FormData>({
     type: '',
     platform: [],
-    kijkers: '',
+    kijkers: 1,
     tijd: '',
     stemming: '',
     genre: '',
@@ -53,7 +53,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
       options: ['Netflix', 'Disney+', 'Amazon Prime', 'HBO Max', 'Apple TV+'],
       type: 'checkbox',
     },
-    { key: 'kijkers', question: 'Met hoeveel personen kijk je?', type: 'number' },
+    { key: 'kijkers', question: 'Met hoeveel personen kijk je?', type: 'slider' },
     {
       key: 'stemming',
       question: 'Wat is je huidige stemming?',
@@ -69,8 +69,8 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
     { key: 'duur', question: 'Wil je iets langs of iets korts kijken?', options: ['Kort', 'Gemiddeld', 'Lang'], type: 'radio' },
   ];
 
-  const handleChange = (value: string | string[]) => {
-    setFormData((prev) => ({ ...prev, [questions[step].key]: value }));
+  const handleChange = (value: string | string[] | number, key: keyof FormData) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
     setError(null);
   };
 
@@ -115,7 +115,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
                   const newValue = checked
                     ? [...currentValue, option]
                     : currentValue.filter((item) => item !== option);
-                  handleChange(newValue);
+                  handleChange(newValue, currentQuestion.key);
                 }}
               />
               <Label htmlFor={option}>{option}</Label>
@@ -126,7 +126,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
 
       {currentQuestion.type === 'radio' && currentQuestion.options && (
         <RadioGroup
-          onValueChange={(value) => handleChange(value)}
+          onValueChange={(value) => handleChange(value, currentQuestion.key)}
           value={formData[currentQuestion.key] as string}
         >
           {currentQuestion.options.map((option) => (
@@ -138,18 +138,28 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
         </RadioGroup>
       )}
 
-      {currentQuestion.type === 'number' && (
-        <Input
-          type="number"
-          value={formData[currentQuestion.key] as string}
-          onChange={(e) => handleChange(e.target.value)}
-          min="1"
-        />
+      {currentQuestion.type === 'slider' && (
+        <div className="space-y-2">
+          <Slider
+            min={1}
+            max={10}
+            step={1}
+            value={formData[currentQuestion.key] as number}
+            onChange={(value: string | number | string[]) => handleChange(value, currentQuestion.key)}
+          />
+          <div className="flex justify-between text-xs text-gray-500">
+            <span>1 persoon</span>
+            <span>10 personen</span>
+          </div>
+          <p className="text-center text-lg font-semibold">
+            {formData[currentQuestion.key]} {formData[currentQuestion.key] === 1 ? 'persoon' : 'personen'}
+          </p>
+        </div>
       )}
 
       {currentQuestion.type === 'select' && (
         <Select
-          onValueChange={(value) => handleChange(value)}
+          onValueChange={(value) => handleChange(value, currentQuestion.key)}
           value={formData[currentQuestion.key] as string}
         >
           <SelectTrigger>
