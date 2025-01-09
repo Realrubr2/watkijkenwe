@@ -6,7 +6,7 @@ import { LoadingAnimation } from '../components/LoadingAnimation';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from '../components/Navbar';
-import { buildChatGPTRequest } from './utils/chatgpt'; 
+import { buildChatGPTRequest } from './api/chatgpt'; 
 
 type RecommendationData = {
   type: string
