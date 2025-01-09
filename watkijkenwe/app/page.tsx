@@ -8,11 +8,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from '../components/Navbar';
 import { buildChatGPTRequest } from './utils/chatgpt'; 
 
+type RecommendationData = {
+  type: string
+  platform: string[]
+  viewers: string
+  time: string
+  mood: string
+  genre: string
+  duration: string
+}
+
 type RecommendationResult = {
   title: string;
   recommendations: Array<{ title: string; description: string }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  collectedData: any;
+  collectedData: RecommendationData;
 };
 
 export default function Home() {
@@ -94,10 +103,12 @@ export default function Home() {
             <div className="bg-gray-100 p-4 rounded-md shadow-md">
               {/* Render collected data in a user-friendly format */}
               {Object.entries(recommendation.collectedData).map(([key, value]) => (
-                <p key={key} className="text-lg mb-2">
-                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {Array.isArray(value) ? value.join(", ") : value}
-                </p>
-              ))}
+  <p key={key} className="text-lg mb-2">
+    <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> 
+    {Array.isArray(value) ? value.join(", ") : value}
+  </p>
+))}
+
             </div>
             <Button onClick={handleRetry} className="mt-4">Nieuwe aanbeveling</Button>
           </div>

@@ -130,7 +130,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
             <SelectValue placeholder="Selecteer een optie" />
           </SelectTrigger>
           <SelectContent>
-            {currentQuestion.options?.map((option) => (
+            {currentQuestion.options.map((option) => (
               <SelectItem key={option} value={option}>{option}</SelectItem>
             ))}
           </SelectContent>
