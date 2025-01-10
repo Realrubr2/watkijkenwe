@@ -1,4 +1,4 @@
-'use client'; 
+ 'use client';
 
 import { useState } from 'react';
 import RecommendationForm from '../components/RecommendationForm';
@@ -6,17 +6,16 @@ import { LoadingAnimation } from '../components/LoadingAnimation';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from '../components/Navbar';
-import { buildChatGPTRequest } from './api/chatgpt'; 
 
 type RecommendationData = {
-  type: string
-  platform: string[]
-  viewers: string
-  time: string
-  mood: string
-  genre: string
-  duration: string
-}
+  type: string;
+  platform: string[];
+  viewers: string;
+  time: string;
+  mood: string;
+  genre: string;
+  duration: string;
+};
 
 type RecommendationResult = {
   title: string;
@@ -33,28 +32,38 @@ export default function Home() {
   const handleSubmit = async (userPreferences: any) => {
     setIsLoading(true);
     setError(null);
-
+  
     try {
-      const apiResponse = await buildChatGPTRequest(userPreferences);
-      
-      if (apiResponse && apiResponse !== "") {
-        const parsedContent = JSON.parse(apiResponse);
-
-        if (parsedContent && Array.isArray(parsedContent.recommendations)) {
+      const response = await fetch('/api/chatgpt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userPreferences),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+  
+        const parsedData = JSON.parse(data)
+       
+        const recommendations = parsedData.recommendations
+        
+       console.log(recommendations)
+        if (recommendations && Array.isArray(recommendations)) {
           setRecommendation({
             title: "Your Recommendations",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            recommendations: parsedContent.recommendations.map((rec: any) => ({
-              title: rec.title,            
+            recommendations: recommendations.map((rec: { title: string, recomendation: string }) => ({
+              title: rec.title,
               description: rec.recomendation,  
             })),
             collectedData: userPreferences,
-          });
+          });        
         } else {
           setError("Invalid recommendations format.");
         }
       } else {
-        setError("No content found in the response.");
+        throw new Error("Failed to fetch recommendations.");
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
@@ -63,6 +72,7 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+  
 
   const handleRetry = () => {
     setError(null);
@@ -103,12 +113,11 @@ export default function Home() {
             <div className="bg-gray-100 p-4 rounded-md shadow-md">
               {/* Render collected data in a user-friendly format */}
               {Object.entries(recommendation.collectedData).map(([key, value]) => (
-  <p key={key} className="text-lg mb-2">
-    <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> 
-    {Array.isArray(value) ? value.join(", ") : value}
-  </p>
-))}
-
+                <p key={key} className="text-lg mb-2">
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> 
+                  {Array.isArray(value) ? value.join(", ") : value}
+                </p>
+              ))}
             </div>
             <Button onClick={handleRetry} className="mt-4">Nieuwe aanbeveling</Button>
           </div>
