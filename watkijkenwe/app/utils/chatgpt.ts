@@ -1,4 +1,5 @@
-// utils/chatgpt.ts
+"use server"
+
 import OpenAI from "openai";
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
@@ -16,7 +17,6 @@ const recommendationsArray = z.object({
 
 
 
-// structure of user preferences
 type UserPreferences = {
   type: string;
   platform: string[];
@@ -48,9 +48,10 @@ export async function buildChatGPTRequest(userPreferences: UserPreferences) {
                 {
                     role: "developer",
                     content:`Je bent een behulpzame assistent die geweldige aanbevelingen doet voor de gebruiker voor het kijken van films. 
-                    Uw aanbevelingen zijn een groot probleem voor de gebruikers, 
-                    omdat ze slecht zijn in het maken van keuzes. Ik zou je aanraden om na te denken over een paar films met goede beoordelingen, 
-                    de mensen die je vragen Deze vragen liggen tussen de 16 en 50, dus houd daar rekening mee bij het doen van aanbevelingen`,
+                    op dit moment ben jij een expert in het aanbevelen van goede films, mensen vanuit heel nederland komen naar jou toe voor advies. 
+                    omdat wij slecht zijn in het maken van keuzes ga jij het voor ons bedenken films series die beschikbaar zijn op het platform dat aangegeven word.
+                    Ik zou je aanraden om na te denken over een paar films met goede beoordelingen, natuurlijk ook 1 of 2 wat oudere films aan te raden
+                    en dan graag de meest populairste en best beoordeeldste als eerst en alsjeblieft geen musical!.`,
                     
                 },
                 {

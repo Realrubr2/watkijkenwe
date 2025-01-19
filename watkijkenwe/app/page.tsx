@@ -6,7 +6,8 @@ import { LoadingAnimation } from '../components/LoadingAnimation';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from '../components/Navbar';
-
+import { callGPT } from './utilsclient/fetching';
+import Image from 'next/image'
 type RecommendationData = {
   type: string;
   platform: string[];
@@ -19,14 +20,14 @@ type RecommendationData = {
 
 type RecommendationResult = {
   title: string;
-  recommendations: Array<{ title: string; description: string }>;
+  recommendations: Array<{ title: string;  image: string; description: string; }>;
   collectedData: RecommendationData;
 };
 
 export default function Home() {
   const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (userPreferences: any) => {
@@ -34,36 +35,19 @@ export default function Home() {
     setError(null);
   
     try {
-      const response = await fetch('/api/chatgpt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userPreferences),
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-  
-        const parsedData = JSON.parse(data)
-       
-        const recommendations = parsedData.recommendations
-        
-       console.log(recommendations)
-        if (recommendations && Array.isArray(recommendations)) {
-          setRecommendation({
-            title: "Your Recommendations",
-            recommendations: recommendations.map((rec: { title: string, recomendation: string }) => ({
-              title: rec.title,
-              description: rec.recomendation,  
-            })),
-            collectedData: userPreferences,
-          });        
-        } else {
-          setError("Invalid recommendations format.");
-        }
+     const recommendations = await callGPT(userPreferences)
+      if (recommendations&& Array.isArray(recommendations)) {
+        setRecommendation({
+          title: "Your Recommendations",
+          recommendations: recommendations.map((rec: { title: string, imageUrl: string, description: string }) => ({
+            title: rec.title,
+            image: rec.imageUrl,
+            description: rec.description,  
+          })),
+          collectedData: userPreferences,
+        });        
       } else {
-        throw new Error("Failed to fetch recommendations.");
+        setError("Invalid recommendations format.");
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
@@ -103,8 +87,18 @@ export default function Home() {
               {/* Render recommendations as simple text in a box */}
               <ul className="space-y-2 text-left text-lg">
                 {recommendation.recommendations.map((rec, index) => (
-                  <li key={index} className="bg-white p-2 rounded-md">
-                    <strong>{rec.title}</strong>: {rec.description}
+                  <li key={index} className="bg-white p-2 rounded-md flex items-center space-x-4">
+                    <div className="flex-grow">
+                      <strong>{rec.title}</strong>: <br />
+                      {rec.description}
+                    </div>
+                    <Image
+                      src={rec.image}
+                      width={150}
+                      height={150}
+                      alt={rec.title}
+                      className="rounded-md" // optional, for styling
+                    />
                   </li>
                 ))}
               </ul>
@@ -124,5 +118,5 @@ export default function Home() {
         )}
       </main>
     </div>
-  );
+  );  
 }
