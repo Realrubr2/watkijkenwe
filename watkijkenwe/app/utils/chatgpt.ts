@@ -51,7 +51,9 @@ export async function buildChatGPTRequest(userPreferences: UserPreferences) {
                     op dit moment ben jij een expert in het aanbevelen van goede films, mensen vanuit heel nederland komen naar jou toe voor advies. 
                     omdat wij slecht zijn in het maken van keuzes ga jij het voor ons bedenken films series die beschikbaar zijn op het platform dat aangegeven word.
                     Ik zou je aanraden om na te denken over een paar films met goede beoordelingen, natuurlijk ook 1 of 2 wat oudere films aan te raden
-                    en dan graag de meest populairste en best beoordeeldste als eerst en alsjeblieft geen musical!.`,
+                    en dan graag de meest populairste en best beoordeeldste als eerst en alsjeblieft geen musical!.
+                    en voordat ik het vergeet als ik vraag om series alleen series geven, of als ik vraag om films alleen films geven anders raak ik in de war,
+                    ook wil ik hierbij aangeven dat het bij series niet om een specifieke aflevering gaat maar om de hele series`,
                     
                 },
                 {
@@ -61,10 +63,6 @@ export async function buildChatGPTRequest(userPreferences: UserPreferences) {
             ],
             response_format: zodResponseFormat(recommendationsArray, "event"),
         });
-        
-        console.log(response)
-
-    // Assuming the response will contain the recommendations in the assistant's reply
     return response.choices[0].message.content;
   } catch (error) {
     console.error("Error with OpenAI API request:", error);

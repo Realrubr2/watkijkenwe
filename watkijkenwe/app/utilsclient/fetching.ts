@@ -1,9 +1,13 @@
 
   
 // Fetches movie posters and merges them with recommendations
-async function fetchMoviePosters(transformedRecommendations: { id: number; movieTitle: string }[]) {
+async function fetchMoviePosters(ismovie: boolean,transformedRecommendations: { id: number; movieTitle: string }[]) {
+    let apiUrl = "/api/tmdb-series"
+    if (ismovie){
+        apiUrl = "/api/tmdb-movie"
+    }
     try {
-      const response = await fetch('/api/tmdb', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,9 +58,11 @@ async function fetchMoviePosters(transformedRecommendations: { id: number; movie
         id: index + 1,
         movieTitle: rec.title,
       }));
-  
-      // Fetch posters and merge into recommendations
-      const recommendationsWithPosters = await fetchMoviePosters(transformedRecommendations);
+      let isMovie = true
+      if (userPreferences.type == 'Serie'){
+        isMovie = false
+      }
+        const recommendationsWithPosters = await fetchMoviePosters(isMovie,transformedRecommendations);
   
       // Return recommendations with images
       return recommendations.map((rec, index) => ({
