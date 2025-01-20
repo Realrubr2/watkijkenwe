@@ -83,6 +83,10 @@ export default function Home() {
     await handleSubmit(lastPreferences);
     setIsResubmitting(false);
   };
+  const reset = () => {
+    setError(null)
+    setRecommendation(null)
+  }
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -99,7 +103,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar onReset={reset} />
       <main className="flex-grow flex flex-col items-center justify-center p-8">
         {error ? (
           <div className="text-center">
