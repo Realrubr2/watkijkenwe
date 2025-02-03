@@ -19,10 +19,10 @@ export async function POST(req: Request) {
     // Convert FormData into a search string
     const searchQuery = `${body.genre} ${body.platform.join(", ")} ${body.tijd} ${body.stemming} ${body.duur}`;
 
-
-   const embedding = await generateEmbedding(searchQuery);
-
-   const query = await searchTurso(embedding)
+    const embedding = await generateEmbedding(searchQuery);
+    
+    console.log(body.type)
+   const query = await searchTurso(embedding, body.type, body.platform, body.genre)
 
  
 

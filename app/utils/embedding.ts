@@ -26,19 +26,38 @@ export async function generateEmbedding(recomendations :string) {
 return response.data[0].embedding;
 }
 
-// here we search tuso db with the vectors just gotten
-export async function searchTurso(embedding: number[]): Promise<Array<{ title: string; image: string; description: string }>> {
-   
-    const vectorString = JSON.stringify(embedding)
-  
-    const { rows } = await turso.execute({
-      sql: `SELECT content.title, content.image_link, content.description
-          FROM embeddings
-          JOIN content ON embeddings.content_id = content.id
-          ORDER BY vector_distance_cos(embeddings.vectors, vector32(?)) ASC
-          LIMIT 5;`,
-       args: [vectorString]
-});
+export async function searchTurso(
+  embedding: number[],
+  type: string,
+  providers: string[],
+  genre: string
+): Promise<Array<{ title: string; image: string; description: string }>> {
+  if (type !== "movie" && type !== "show") {
+    throw new Error("Invalid type. Type must be either 'movie' or 'show'.");
+  }
+
+  if (!providers || providers.length === 0) {
+    throw new Error("At least one provider must be specified.");
+  }
+
+  const vectorString = JSON.stringify(embedding);
+
+  // Prepare placeholders for providers
+  const providerPlaceholders = providers.map(() => "?").join(", ");
+
+  const { rows } = await turso.execute({
+    sql: `
+      SELECT content.title, content.image_link, content.description
+      FROM embeddings
+      JOIN content ON embeddings.content_id = content.id
+      WHERE content.type = ?
+      AND LOWER(content.provider) IN (${providerPlaceholders})  -- Case-insensitive match for provider
+      AND LOWER(content.genres) LIKE LOWER(?)  -- Case-insensitive partial match for genre
+      ORDER BY vector_distance_cos(embeddings.vectors, vector32(?)) ASC
+      LIMIT 5;
+    `,
+    args: [type, ...providers.map((provider) => provider.toLowerCase()), `%${genre.toLowerCase()}%`, vectorString],  // Lowercase everything
+  });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return rows.map((row: any) => ({
