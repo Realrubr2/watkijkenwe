@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wat kijken wij",
+  title: "Wat kijkn we",
   description: "Weet jij niet wat je moet kijken, watkijkwe heeft de oplossing, geef aan waar je intresses liggen en wij geven de juiste aanraders",
 };
 
