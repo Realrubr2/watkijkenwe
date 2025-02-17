@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Wat kijkn we",
-  description: "Weet jij niet wat je moet kijken, watkijkwe heeft de oplossing, geef aan waar je intresses liggen en wij geven de juiste aanraders",
+  description: "Watkijkenwe helpt je de beste series te vinden op jouw favoriete streamingplatform. Ontvang Ai gedreven aanbevelingen en ontdek je volgende favoriete film of serie!",
 };
 
 export default function RootLayout({
