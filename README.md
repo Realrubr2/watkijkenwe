@@ -1,4 +1,4 @@
-#Watkijkenwe
+# Watkijkenwe
 
 WatKijkenWe is een platform dat je helpt de beste series te vinden op jouw favoriete streamingdiensten.
 website is te vinden op watkijkenwe.nl
