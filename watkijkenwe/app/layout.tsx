@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wat kijkn we",
+  title: "Wat kijken we",
   description: "Watkijkenwe helpt je de beste series te vinden op jouw favoriete streamingplatform. Ontvang Ai gedreven aanbevelingen en ontdek je volgende favoriete film of serie!",
 };
 
