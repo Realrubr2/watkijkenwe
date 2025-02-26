@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Watkijkenwe",
-  description: "Voor als je ff niet weet wat je moet kijken",
+  title: "Wat kijken we",
+  description: "Watkijkenwe helpt je de beste series te vinden op jouw favoriete streamingplatform. Ontvang Ai gedreven aanbevelingen en ontdek je volgende favoriete film of serie!",
 };
 
 export default function RootLayout({
@@ -24,6 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link rel="icon" href="/icon.ico" sizes="any"></link>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
