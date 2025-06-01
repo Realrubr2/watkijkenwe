@@ -6,7 +6,7 @@ import { LoadingAnimation } from "../components/LoadingAnimation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from "../components/Navbar";
-import { callDatabase, callGPT } from "./utilsclient/fetching";
+import { callDatabase, callGPT, getCombinedRecommendations } from "./utilsclient/fetching";
 import Image from "next/image";
 
 type RecommendationData = {
@@ -42,7 +42,7 @@ export default function Home() {
     setLastPreferences(userPreferences);
 
     try {
-      const recommendations = await callDatabase(userPreferences);
+      const recommendations = await getCombinedRecommendations(userPreferences);
       if (recommendations && Array.isArray(recommendations)) {
         setRecommendation({
           title: "Your Recommendations",

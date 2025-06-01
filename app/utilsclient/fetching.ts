@@ -112,3 +112,30 @@ export async function callDatabase(userPreferences: any) {
     );
   }
 }
+
+
+export async function getCombinedRecommendations(userPreferences: any) {
+  // First, try the database
+  const dbResults = await callDatabase(userPreferences);
+
+  if (dbResults.length >= 5) {
+    return dbResults.slice(0, 5);
+  }
+
+  // If less than 5, we get more from gippity
+  const gptResults = await callGPT(userPreferences);
+
+  // Combine
+ const titles = new Set(dbResults.map(r => r.title));
+const combined: any[] = [
+  ...dbResults,
+  ...gptResults.filter(r => !titles.has(r.title))
+].slice(0, 5);
+
+return combined.map(rec => ({
+  title: rec.title,
+  image: rec.image || rec.imageUrl || "",
+  description: rec.description || rec.recomendation || "",
+}));
+
+}

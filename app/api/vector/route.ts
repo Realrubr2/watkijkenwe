@@ -21,10 +21,7 @@ export async function POST(req: Request) {
 
     const embedding = await generateEmbedding(searchQuery);
     
-    console.log(body.type)
    const query = await searchTurso(embedding, body.type, body.platform, body.genre)
-
- 
 
     return NextResponse.json(query);
   } catch (error) {

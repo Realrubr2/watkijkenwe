@@ -32,6 +32,7 @@ export async function searchTurso(
   providers: string[],
   genre: string
 ): Promise<Array<{ title: string; image: string; description: string }>> {
+  
   if (type !== "movie" && type !== "show") {
     throw new Error("Invalid type. Type must be either 'movie' or 'show'.");
   }
@@ -46,18 +47,24 @@ export async function searchTurso(
   const providerPlaceholders = providers.map(() => "?").join(", ");
 
   const { rows } = await turso.execute({
-    sql: `
-      SELECT content.title, content.image_link, content.description
-      FROM embeddings
-      JOIN content ON embeddings.content_id = content.id
-      WHERE content.type = ?
-      AND LOWER(content.provider) IN (${providerPlaceholders})  -- Case-insensitive match for provider
-      AND LOWER(content.genres) LIKE LOWER(?)  -- Case-insensitive partial match for genre
-      ORDER BY vector_distance_cos(embeddings.vectors, vector32(?)) ASC
-      LIMIT 5;
-    `,
-    args: [type, ...providers.map((provider) => provider.toLowerCase()), `%${genre.toLowerCase()}%`, vectorString],  // Lowercase everything
-  });
+  sql: `
+    SELECT content.title, content.image_link, content.description
+    FROM embeddings
+    JOIN content ON embeddings.content_id = content.id
+    WHERE content.type = ?
+    AND LOWER(content.provider) IN (${providerPlaceholders})
+    AND LOWER(content.genres) LIKE ?
+    ORDER BY vector_distance_cos(embeddings.vectors, vector32(?)) ASC
+    LIMIT 5;
+  `,
+  args: [
+    type,
+    ...providers.map((provider) => provider.toLowerCase()),
+    `%${genre.toLowerCase()}%`,
+    vectorString
+  ],
+});
+
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return rows.map((row: any) => ({
