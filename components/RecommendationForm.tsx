@@ -18,6 +18,25 @@ type FormData = {
   genre: string;
   duur: string;
 };
+const translationMap: Record<string, string> = {
+  "Film": "movie",
+  "Serie": "show",
+  "Vrolijk": "happy",
+  "Ontspannen": "relaxed",
+  "Avontuurlijk": "adventurous",
+  "Romantisch": "romantic",
+  "Gespannen": "tense",
+  "Actie": "action",
+  "Komedie": "comedy",
+  "Drama": "drama",
+  "Sci-Fi": "sci-fi",
+  "Horror": "horror",
+  "Romantiek": "romance",
+  "Kort": "short",
+  "Gemiddeld": "medium",
+  "Lang": "long"
+};
+
 
 type Question = {
   key: keyof FormData;
@@ -77,7 +96,7 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
   const handleNext = () => {
     const currentQuestion = questions[step];
     const currentValue = formData[currentQuestion.key];
-
+  
     if (
       (!currentValue && currentQuestion.type !== 'checkbox') ||
       (currentQuestion.type === 'checkbox' && Array.isArray(currentValue) && currentValue.length === 0)
@@ -85,14 +104,25 @@ export default function RecommendationForm({ onSubmit }: { onSubmit: (data: Form
       setError('Maak alstublieft een keuze voordat u verdergaat.');
       return;
     }
-
+  
     if (step < questions.length - 1) {
       setStep((prevStep) => prevStep + 1);
       setError(null);
     } else {
-      onSubmit(formData);
+      // Convert answers to English before submitting
+      const translatedData: FormData = {
+        ...formData,
+        type: translationMap[formData.type] || formData.type,
+        stemming: translationMap[formData.stemming] || formData.stemming,
+        genre: translationMap[formData.genre] || formData.genre,
+        duur: translationMap[formData.duur] || formData.duur,
+        platform: formData.platform.map(p => translationMap[p] || p) // Convert array values
+      };
+  
+      onSubmit(translatedData);
     }
   };
+  
 
   const currentQuestion = questions[step];
   const isAnswered = currentQuestion.type === 'checkbox'
